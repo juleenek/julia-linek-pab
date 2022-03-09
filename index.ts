@@ -15,7 +15,7 @@ enum MathOperations {
 app.get('/', function (req, res) {
 
     const operation: MathOperations = req.query.operations;
-    const num1 =  +req.query.num1; // Convert to number, defult is string
+    const num1 =  +req.query.num1; // Convert to number, default is string
     const num2 = +req.query.num2;
 
     switch(operation) {
