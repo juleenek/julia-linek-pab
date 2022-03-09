@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+// enum domyślnie: 0, 1, 2, 3
 var MathOperations;
 (function (MathOperations) {
     MathOperations["dodaj"] = "dodaj";
@@ -7,22 +8,23 @@ var MathOperations;
     MathOperations["podziel"] = "podziel";
     MathOperations["pomnoz"] = "pomnoz";
 })(MathOperations || (MathOperations = {}));
+// http://localhost:3000/?num1=10&num2=20&operations=dodaj
 app.get('/', function (req, res) {
     var operation = req.query.operations;
-    var num1 = +req.query.num1;
+    var num1 = +req.query.num1; // Convert to number, defult is string
     var num2 = +req.query.num2;
     switch (operation) {
         case MathOperations.dodaj:
-            res.send("".concat(num1 + num2));
+            res.send("Wynik ".concat(num1, " + ").concat(num2, " = ").concat(num1 + num2));
             break;
         case MathOperations.usun:
-            res.send("".concat(num1 - num2));
+            res.send("Wynik ".concat(num1, " - ").concat(num2, " = ").concat(num1 - num2));
             break;
         case MathOperations.podziel:
-            res.send("".concat(num1 / num2));
+            res.send("Wynik ".concat(num1, " / ").concat(num2, " = ").concat(num1 / num2));
             break;
         case MathOperations.pomnoz:
-            res.send("".concat(num1 * num2));
+            res.send("Wynik ".concat(num1, " * ").concat(num2, " = ").concat(num1 * num2));
             break;
     }
 });
