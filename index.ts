@@ -1,6 +1,8 @@
 const express = require('express')  
 const app = express()  
 
+// enum domyślnie: 0, 1, 2, 3
+
 enum MathOperations {
     dodaj = 'dodaj',
     usun = 'usun',
