@@ -8,6 +8,8 @@ enum MathOperations {
     pomnoz = 'pomnoz'
 }
 
+// http://localhost:3000/?num1=10&num2=20&operations=dodaj
+
 app.get('/', function (req, res) {
 
 const operation: MathOperations = req.query.operations;
