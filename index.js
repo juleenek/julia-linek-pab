@@ -11,7 +11,7 @@ var MathOperations;
 // http://localhost:3000/?num1=10&num2=20&operations=dodaj
 app.get('/', function (req, res) {
     var operation = req.query.operations;
-    var num1 = +req.query.num1; // Convert to number, defult is string
+    var num1 = +req.query.num1; // Convert to number, default is string
     var num2 = +req.query.num2;
     switch (operation) {
         case MathOperations.dodaj:

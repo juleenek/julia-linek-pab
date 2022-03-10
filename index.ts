@@ -12,11 +12,11 @@ enum MathOperations {
 
 // http://localhost:3000/?num1=10&num2=20&operations=dodaj
 
-app.get('/', function (req, res) {
+app.get('/:num1/:num2/:operation', function (req, res) {
 
-    const operation: MathOperations = req.query.operations;
-    const num1 =  +req.query.num1; // Convert to number, default is string
-    const num2 = +req.query.num2;
+    const operation: MathOperations = req.params.operations;
+    const num1 =  +req.params.num1; // Convert to number, default is string
+    const num2 = +req.parms.num2;
 
     switch(operation) {
         case MathOperations.dodaj:
