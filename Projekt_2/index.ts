@@ -29,7 +29,7 @@ app.get('/note', function (req: Request, res: Response) {
 
 app.post('/note', function (req: Request, res: Response) {
   // const title = req.body.title; -  nie muszę parsować JSONa
- const currDate = new Date();
+  const currDate = new Date();
   const note: Note = {
     id: id++,
     title: req.body.title,
@@ -44,7 +44,7 @@ app.post('/note', function (req: Request, res: Response) {
     console.log(req.body); // e.x. req.body.title
     res.send('POST Hello World');
   } else {
-    res.status(404)
+    res.status(404);
   }
 });
 
