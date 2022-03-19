@@ -36,8 +36,19 @@ class Note {
 
 const notes: Note[] = [];
 
-app.get('/note', function (req: Request, res: Response) {
-  res.send('GET Hello World');
+app.get('/note/:id', function (req: Request, res: Response) {
+  const { id } = req.params;
+
+  if (notes.some((note) => note.id === +id)) {
+    let note = notes.filter((note) => {
+      return note.id === +id;
+    });
+    res.send(note);
+  } else{
+    res.status(404).send({
+      error: `Note not found`,
+    });
+  }
 });
 
 app.post('/note', function (req: Request, res: Response) {
@@ -47,12 +58,12 @@ app.post('/note', function (req: Request, res: Response) {
 
   if (title === undefined) {
     res.status(404).send({
-      error: 'Please, enter a title',
+      error: `Please, enter a title`,
     });
   }
   if (content === undefined) {
     res.status(404).send({
-      error: 'Please, enter a title',
+      error: `Please, enter a title`,
     });
   } else {
     // It returns the number of milliseconds between 1 January 1970 00:00:00 UTC and the given date as the contents of the Date() constructor.
