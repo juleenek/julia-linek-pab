@@ -51,9 +51,8 @@ app.get('/note/:id', function (req: Request, res: Response) {
     return note.id === +id;
   });
 
-  checkRequired(note, res, 'Note not found')
+  checkRequired(note, res, 'Note not found');
   res.status(200).send(note);
-  
 });
 
 app.post('/note', function (req: Request, res: Response) {
@@ -69,19 +68,27 @@ app.post('/note', function (req: Request, res: Response) {
 });
 
 app.put('/note/:id', function (req: Request, res: Response) {
-
   let note: Note = req.body;
-  let noteBefore = notes.find(e => e.id === (+req.params.id)); 
+  let noteBefore = notes.find(e => e.id === +req.params.id);
 
   checkRequired(note.title, res, 'Please, enter a title');
   checkRequired(note.content, res, 'Please, enter a content');
   checkRequired(noteBefore, res, 'Note not found');
-  
+
   // https://javascript.info/object-copy
   noteBefore = Object.assign(noteBefore, note);
- 
-  res.status(201).send(noteBefore);
 
+  res.status(201).send(noteBefore);
+});
+
+app.delete('/note/:id', function (req: Request, res: Response) {
+
+  const note = notes.find(e => e.id === (+req.params.id));
+  checkRequired(note, res, 'Note not found');
+
+  notes.splice(notes.findIndex(note => note.id === (+req.params.id)), 1)
+  res.status(204).send(note);
+  
 });
 
 app.listen(3000);
