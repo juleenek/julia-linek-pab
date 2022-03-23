@@ -2,6 +2,7 @@ import express from 'express';
 import { Request, Response } from 'express';
 import Note from '../Projekt_2/Note';
 import Tag from '../Projekt_2/Tag';
+import { findAllNotes, createNote } from './service';
 
 const app = express();
 
@@ -29,6 +30,7 @@ const checkRequired = (
 /////////////////// CRUDE NOTE ///////////////////
 
 const notes: Note[] = [];
+export default notes;
 
 app.get('/note/:id', function (req: Request, res: Response) {
   const id = +req.params.id;
@@ -41,7 +43,8 @@ app.get('/note/:id', function (req: Request, res: Response) {
 });
 
 app.get('/notes', function (req: Request, res: Response) {
-  res.status(200).send(notes);
+  findAllNotes();
+  res.status(200);
 });
 
 app.post('/note', function (req: Request, res: Response) {
@@ -60,6 +63,7 @@ app.post('/note', function (req: Request, res: Response) {
     tag.id = new Date().valueOf();
     tags.push(tag);
     note.id = new Date().valueOf();
+    createNote(note);
     notes.push(note);
     res.status(201).send(note);
   }
