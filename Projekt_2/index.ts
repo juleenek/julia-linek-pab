@@ -46,28 +46,46 @@ app.get('/notes', function (req: Request, res: Response) {
 
 app.post('/note', function (req: Request, res: Response) {
   const note: Note = req.body; // nie muszę parsować na JSON
+  const tag: Tag = req.body.tags;
 
   checkRequired(note.title, res, 'Please, enter a title', 400);
   checkRequired(note.content, res, 'Please, enter a content', 400);
 
-  // It returns the number of milliseconds between 1 January 1970 00:00:00 UTC and the given date as the contents of the Date() constructor.
-  note.id = new Date().valueOf();
-  notes.push(note);
-  res.status(201).send(note);
+  const name = (tag.name = tag.name.toLowerCase());
+  if (tags.some((tag) => tag.name === name)) {
+    res.status(404).send({
+      error: 'Tag already exist',
+    });
+  } else {
+    tag.id = new Date().valueOf();
+    tags.push(tag);
+    note.id = new Date().valueOf();
+    notes.push(note);
+    res.status(201).send(note);
+  }
 });
 
 app.put('/note/:id', function (req: Request, res: Response) {
   let note: Note = req.body;
+  const tag: Tag = req.body.tags;
   let noteBefore = notes.find((e) => e.id === +req.params.id);
 
   checkRequired(note.title, res, 'Please, enter a title', 404);
   checkRequired(note.content, res, 'Please, enter a content', 404);
   checkRequired(noteBefore, res, 'Note not found', 404);
 
-  // https://javascript.info/object-copy
-  noteBefore = Object.assign(noteBefore, note);
-
-  res.status(201).send(noteBefore);
+  const name = (tag.name = tag.name.toLowerCase());
+  if (tags.some((tag) => tag.name === name)) {
+    res.status(404).send({
+      error: 'Tag already exist',
+    });
+  } else {
+    tag.id = new Date().valueOf();
+    tags.push(tag);
+    // https://javascript.info/object-copy
+    noteBefore = Object.assign(noteBefore, note);
+    res.status(201).send(noteBefore);
+  }
 });
 
 app.delete('/note/:id', function (req: Request, res: Response) {

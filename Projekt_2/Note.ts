@@ -1,8 +1,10 @@
+import Tag from "./Tag";
+
 class Note {
   title: string;
   content: string;
   createDate?: string;
-  tags?: string[];
+  tags?: Tag[];
   id?: number;
 
   constructor(note: Note) {
@@ -16,3 +18,9 @@ class Note {
 }
 
 export default Note;
+
+// { 
+//   "title": "abc",
+//   "content": "abcabc",
+//   "tags": {"name": "abcd"}
+// }
