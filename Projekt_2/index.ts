@@ -1,17 +1,39 @@
 import express from 'express';
+import fs from 'fs';
 import { Request, Response } from 'express';
 import Note from '../Projekt_2/Note';
 import Tag from '../Projekt_2/Tag';
-import { findAllNotes, createNote } from './service';
 
 const app = express();
+const storeFile = '../Projekt_2/data/storeFile.json';
+
+let notes: Note[] = [];
+let tags: Tag[] = [];
 
 app.use(express.json()); // praca z JSONem
 
-// Przyklad parsowania którego teraz nie muszę robić
-// const jsonNote = JSON.stringify(note);
+class Service{
+  public async updateStorage(): Promise<void> {
+    const data = { notes, tags };
+    try {
+      await fs.promises.writeFile(storeFile, JSON.stringify(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async readStorage(): Promise<void> {
+    try {
+      const data = await fs.promises.readFile(storeFile, 'utf-8');
+      notes = JSON.parse(data).notes;
+      tags = JSON.parse(data).tags;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}
 
-const currDate = new Date();
+const service = new Service();
+service.readStorage();
 
 // That function check required fields
 const checkRequired = (
@@ -29,7 +51,6 @@ const checkRequired = (
 
 /////////////////// CRUDE NOTE ///////////////////
 
-const notes: Note[] = [];
 export default notes;
 
 app.get('/note/:id', function (req: Request, res: Response) {
@@ -43,8 +64,7 @@ app.get('/note/:id', function (req: Request, res: Response) {
 });
 
 app.get('/notes', function (req: Request, res: Response) {
-  findAllNotes();
-  res.status(200);
+  res.status(200).send(notes);
 });
 
 app.post('/note', function (req: Request, res: Response) {
@@ -63,8 +83,8 @@ app.post('/note', function (req: Request, res: Response) {
     tag.id = new Date().valueOf();
     tags.push(tag);
     note.id = new Date().valueOf();
-    createNote(note);
     notes.push(note);
+    service.updateStorage();
     res.status(201).send(note);
   }
 });
@@ -86,7 +106,7 @@ app.put('/note/:id', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
-    // https://javascript.info/object-copy
+    // https://j...content-available-to-author-only...t.info/object-copy
     noteBefore = Object.assign(noteBefore, note);
     res.status(201).send(noteBefore);
   }
@@ -104,8 +124,6 @@ app.delete('/note/:id', function (req: Request, res: Response) {
 });
 
 ///////////////////// CRUDE TAG /////////////////////
-
-const tags: Tag[] = [];
 
 app.get('/tag/:id', function (req: Request, res: Response) {
   const id = +req.params.id;
@@ -135,6 +153,7 @@ app.post('/tag', function (req: Request, res: Response) {
     });
   } else {
     tags.push(tag);
+    service.updateStorage();
     res.status(201).send(tag);
   }
 });
