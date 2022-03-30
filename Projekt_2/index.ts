@@ -262,9 +262,9 @@ app.post('/login', function (req: Request, res: Response) {
       token: token,
       data: user,
     });
+    res.status(200).send(token);
   } else {
-    res.json({
-      login: false,
+    res.status(401).send({
       error: 'Please check name and password.',
     });
   }
