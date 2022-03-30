@@ -5,26 +5,42 @@ import Note from '../Projekt_2/Note';
 import Tag from '../Projekt_2/Tag';
 
 const app = express();
-const storeFile = '../Projekt_2/data/storeFile.json';
 
+const storeNoteFile = '../Projekt_2/data/storeNotes.json';
+const storeTagFile = '../Projekt_2/data/storeTags.json';
 let notes: Note[] = [];
 let tags: Tag[] = [];
 
 app.use(express.json()); // praca z JSONem
 
-class Service{
-  public async updateStorage(): Promise<void> {
-    const data = { notes, tags };
+class Service {
+  public async updateNoteStorage(): Promise<void> {
+    const data = { notes };
     try {
-      await fs.promises.writeFile(storeFile, JSON.stringify(data));
+      await fs.promises.writeFile(storeNoteFile, JSON.stringify(data));
     } catch (err) {
       console.log(err);
     }
   }
-  public async readStorage(): Promise<void> {
+  public async readNoteStorage(): Promise<void> {
     try {
-      const data = await fs.promises.readFile(storeFile, 'utf-8');
+      const data = await fs.promises.readFile(storeNoteFile, 'utf-8');
       notes = JSON.parse(data).notes;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async updateTagStorage(): Promise<void> {
+    const data = { tags };
+    try {
+      await fs.promises.writeFile(storeTagFile, JSON.stringify(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async readTagStorage(): Promise<void> {
+    try {
+      const data = await fs.promises.readFile(storeTagFile, 'utf-8');
       tags = JSON.parse(data).tags;
     } catch (err) {
       console.log(err);
@@ -33,7 +49,8 @@ class Service{
 }
 
 const service = new Service();
-service.readStorage();
+service.readNoteStorage();
+service.readTagStorage();
 
 // That function check required fields
 const checkRequired = (
@@ -82,9 +99,10 @@ app.post('/note', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
+    service.updateTagStorage();
     note.id = new Date().valueOf();
     notes.push(note);
-    service.updateStorage();
+    service.updateNoteStorage();
     res.status(201).send(note);
   }
 });
@@ -106,8 +124,10 @@ app.put('/note/:id', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
+    service.updateTagStorage();
     // https://j...content-available-to-author-only...t.info/object-copy
     noteBefore = Object.assign(noteBefore, note);
+    service.updateNoteStorage();
     res.status(201).send(noteBefore);
   }
 });
@@ -153,7 +173,7 @@ app.post('/tag', function (req: Request, res: Response) {
     });
   } else {
     tags.push(tag);
-    service.updateStorage();
+    service.updateTagStorage();
     res.status(201).send(tag);
   }
 });
@@ -173,6 +193,7 @@ app.put('/tag/:id', function (req: Request, res: Response) {
     });
   } else {
     tagBefore = Object.assign(tagBefore, tag);
+    service.updateTagStorage();
     res.status(201).send(tagBefore);
   }
 });
