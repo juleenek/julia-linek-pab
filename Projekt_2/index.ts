@@ -1,8 +1,10 @@
 import express from 'express';
 import fs from 'fs';
 import { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import Note from '../Projekt_2/Note';
 import Tag from '../Projekt_2/Tag';
+import User from '../Projekt_2/User';
 
 const app = express();
 
@@ -31,6 +33,7 @@ class Service {
     }
   }
   public async updateTagStorage(): Promise<void> {
+    // to do: parametry
     const data = { tags };
     try {
       await fs.promises.writeFile(storeTagFile, JSON.stringify(data));
@@ -209,4 +212,68 @@ app.delete('/tag/:id', function (req: Request, res: Response) {
   res.status(204).send(tag);
 });
 
+///////////////////// LOGIN USER /////////////////////
+
+let users = [
+  {
+    login: 'wiesiek123',
+    password: 'lubiemietka',
+  },
+  {
+    login: 'mietek123',
+    password: 'ajchemlem',
+  },
+];
+
+// const isAuth = (req: Request) => {
+//   const authData = req.headers['authorization'];
+//   if (!authData) throw new Error('You need to log in');
+//   const token = authData?.split(' ')[1] ?? '';
+//   const { user_id } = verify(token, process.env.ACCESS_TOKEN_SECRET);
+//   return { user_id, token };
+// };
+
+app.post('/login', function (req: Request, res: Response) {
+  const user: User = req.body;
+
+  checkRequired(user.login, res, 'Please, enter a login', 400);
+  checkRequired(user.password, res, 'Please, enter a password', 400);
+
+  user.id = new Date().valueOf();
+  const payload = user.login;
+  const secret = user.password;
+
+  let isPresent = false;
+  let isPresnetIndex = null;
+
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].login === payload && users[i].password === secret) {
+      isPresent = true;
+      // Store the data index
+      isPresnetIndex = i;
+      break;
+    }
+  }
+  if (isPresent) {
+    // Create token
+    const token = jwt.sign(payload, secret);
+    res.json({
+      login: true,
+      token: token,
+      data: user,
+    });
+  } else {
+    res.json({
+      login: false,
+      error: 'Please check name and password.',
+    });
+  }
+});
+
 app.listen(3000);
+
+// const authData = req.headers.authorization
+// const token = authData?.split(' ')[1] ?? ''
+// const payload = jwt.verify(token, secret)
+// @types/jsonwebtoken
+// sekcja headers -> wartość Bearer token
