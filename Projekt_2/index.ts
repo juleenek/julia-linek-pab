@@ -243,6 +243,8 @@ app.post('/login', function (req: Request, res: Response) {
   const payload = user.login;
   const secret = user.password;
 
+  // https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
+
   let isPresent = false;
   let isPresnetIndex = null;
 
@@ -257,11 +259,11 @@ app.post('/login', function (req: Request, res: Response) {
   if (isPresent) {
     // Create token
     const token = jwt.sign(payload, secret);
-    res.json({
-      login: true,
-      token: token,
-      data: user,
-    });
+    // res.json({
+    //   login: true,
+    //   token: token,
+    //   data: user,
+    // });
     res.status(200).send(token);
   } else {
     res.status(401).send({
