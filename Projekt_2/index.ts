@@ -16,6 +16,30 @@ let tags: Tag[] = [];
 app.use(express.json()); // praca z JSONem
 
 class Service {
+  ////////////////////
+  public async updateStorage<ObjetcsArrayType>(
+    arr: ObjetcsArrayType,
+    storeFile: string
+  ): Promise<void> {
+    try {
+      const data = { arr };
+      await fs.promises.writeFile(storeFile, JSON.stringify(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async readStorage<ObjetcsArrayType>(
+    arr: ObjetcsArrayType,
+    storeFile: string
+  ): Promise<void> {
+    try {
+      const data = await fs.promises.readFile(storeFile, 'utf-8');
+      arr = JSON.parse(data).arr;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  ///////////////////
   public async updateNoteStorage(): Promise<void> {
     const data = { notes };
     try {
@@ -93,6 +117,7 @@ app.post('/note', function (req: Request, res: Response) {
 
   checkRequired(note.title, res, 'Please, enter a title', 400);
   checkRequired(note.content, res, 'Please, enter a content', 400);
+
 
   const name = (tag.name = tag.name.toLowerCase());
   if (tags.some((tag) => tag.name === name)) {
@@ -224,14 +249,6 @@ let users = [
     password: 'ajchemlem',
   },
 ];
-
-// const isAuth = (req: Request) => {
-//   const authData = req.headers['authorization'];
-//   if (!authData) throw new Error('You need to log in');
-//   const token = authData?.split(' ')[1] ?? '';
-//   const { user_id } = verify(token, process.env.ACCESS_TOKEN_SECRET);
-//   return { user_id, token };
-// };
 
 app.post('/login', function (req: Request, res: Response) {
   const user: User = req.body;
