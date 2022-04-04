@@ -1,20 +1,27 @@
-// import Tag from './Tag';
-// import Note from './Note';
-// import notes from './index';
-// import fs from 'fs';
+import fs from 'fs';
 
-// export const findAllNotes = async (): Promise<void> => {
-//   try {
-//     const data = await fs.promises.readFile('notes.json', 'utf-8');
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+export class Serviced {
+  public async updateStorage<ObjetcsArrayType>(
+    arr: ObjetcsArrayType,
+    storeFile: string
+  ): Promise<void> {
+    try {
+      const data = { arr };
+      await fs.promises.writeFile(storeFile, JSON.stringify(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  public async readStorage<ObjetcsArrayType>(
+    arr: ObjetcsArrayType,
+    storeFile: string
+  ): Promise<void> {
+    try {
+      const data = await fs.promises.readFile(storeFile, 'utf-8');
+      arr = JSON.parse(data).arr;
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
-// export const createNote = async (note: Note): Promise<void> => {
-//   try {
-//     await fs.promises.writeFile('data/notes.json', JSON.stringify(note));
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
+}

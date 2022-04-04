@@ -2,44 +2,21 @@ import express from 'express';
 import fs from 'fs';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import Note from '../Projekt_2/Note';
-import Tag from '../Projekt_2/Tag';
-import User from '../Projekt_2/User';
+import Note from './models/Note';
+import Tag from './models/Tag';
+import {User} from './models/User';
+import {users} from './models/User';
+import {Serviced} from './service';
 
 const app = express();
 
 const storeNoteFile = '../Projekt_2/data/storeNotes.json';
 const storeTagFile = '../Projekt_2/data/storeTags.json';
-let notes: Note[] = [];
-let tags: Tag[] = [];
 
-app.use(express.json()); // praca z JSONem
+export let notes: Note[] = [];
+export let tags: Tag[] = [];
 
-class Service {
-  ////////////////////
-  public async updateStorage<ObjetcsArrayType>(
-    arr: ObjetcsArrayType,
-    storeFile: string
-  ): Promise<void> {
-    try {
-      const data = { arr };
-      await fs.promises.writeFile(storeFile, JSON.stringify(data));
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async readStorage<ObjetcsArrayType>(
-    arr: ObjetcsArrayType,
-    storeFile: string
-  ): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(storeFile, 'utf-8');
-      arr = JSON.parse(data).arr;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  ///////////////////
+class Service{
   public async updateNoteStorage(): Promise<void> {
     const data = { notes };
     try {
@@ -74,6 +51,8 @@ class Service {
     }
   }
 }
+
+app.use(express.json()); // praca z JSONem
 
 const service = new Service();
 service.readNoteStorage();
@@ -238,17 +217,6 @@ app.delete('/tag/:id', function (req: Request, res: Response) {
 });
 
 ///////////////////// LOGIN USER /////////////////////
-
-let users = [
-  {
-    login: 'wiesiek123',
-    password: 'lubiemietka',
-  },
-  {
-    login: 'mietek123',
-    password: 'ajchemlem',
-  },
-];
 
 app.post('/login', function (req: Request, res: Response) {
   const user: User = req.body;
