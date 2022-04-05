@@ -16,6 +16,9 @@ const storeTagFile = '../Projekt_2/data/storeTags.json';
 
 export let notes: Note[] = [];
 export let tags: Tag[] = [];
+export let users: User[] = [];
+users.push(user);
+
 
 class Service {
   public async updateNoteStorage(): Promise<void> {
@@ -70,7 +73,17 @@ app.get('/note/:id', function (req: Request, res: Response) {
   });
 
   checkRequired(note, res, 'Note not found', 404);
+  isAuth(req, res, req.body.password);
   res.status(200).send(note);
+
+  // if (user.notesId!.includes(note.id)) {
+  //   res.status(200).send(note);
+  // } else {
+  //   res.status(401).send({
+  //     error: `User doesn't have note with this id.`
+  //   });
+  // }
+
 });
 
 app.get('/notes', function (req: Request, res: Response) {
@@ -84,6 +97,8 @@ app.post('/note', function (req: Request, res: Response) {
   checkRequired(note.content, res, 'Please, enter a content', 400);
 
   isAuth(req, res, req.body.password);
+  const authData = req.headers['authorization'];
+  const token = authData?.split(' ')[1] ?? '';
 
   const name = (tag.name = tag.name.toLowerCase());
   if (tags.some((tag) => tag.name === name)) {
@@ -97,6 +112,32 @@ app.post('/note', function (req: Request, res: Response) {
     note.id = new Date().valueOf();
     notes.push(note);
     service.updateNoteStorage();
+
+    let userWithTok = users.find( u => u.token === token) 
+
+      // console.log(userWithTok);
+      if (userWithTok) {
+        if (userWithTok.notesId == undefined && userWithTok.tagsId == undefined) {
+          userWithTok.notesId = [];
+          userWithTok.tagsId = [];
+        } 
+        userWithTok!.notesId!.push(note.id);
+        userWithTok!.tagsId!.push(tag.id);
+      }
+      console.log(userWithTok);
+    // for (let i = 0; i < users.length; i++) {
+    //   if (users[i].token === token) {
+    //     if (users[i].notesId === undefined && users[i].tagsId === undefined) {
+    //       users[i].notesId = [];
+    //       users[i].tagsId = [];
+    //       users[i]!.notesId!.push(note.id);
+    //       users[i]!.tagsId!.push(tag.id);
+    //     } else {
+    //       users[i]!.notesId!.push(note.id);
+    //       users[i]!.tagsId!.push(tag.id);
+    //     }
+    //   }
+    // }
     // for (let i = 0; i < users.length; i++) {
     //   if (users[i].password === req.body.password) {
     //     users[i].notesId!.push(note.id);
@@ -104,18 +145,9 @@ app.post('/note', function (req: Request, res: Response) {
     //     break;
     //   }
     // }
-    if (user.notesId! === undefined && user.tagsId! === undefined) {
-      user.notesId = [];
-      user.tagsId = [];
-      user.notesId!.push(note.id);
-      user.tagsId!.push(tag.id);
-    } else {
-      user.notesId!.push(note.id);
-      user.tagsId!.push(tag.id);
-    }
     // users[0].notesId.push(note.id);
     res.status(201).send(note);
-    console.log(user);
+    // console.log(users);
   }
 });
 
@@ -233,18 +265,17 @@ app.post('/login', function (req: Request, res: Response) {
   let isPresent = false;
   let isPresnetIndex = null;
 
-  // for (let i = 0; i < users.length; i++) {
-  //   if (users[i].login === payload && users[i].password === secret) {
-  //     isPresent = true;
-  //     isPresnetIndex = i;
-  //     break;
-  //   }
-  // }
-  if (user.login === payload && user.password === secret) {
-    isPresent = true;
+  for (let i = 0; i < users.length; i++) {
+    if (users[i].login === payload && users[i].password === secret) {
+      isPresent = true;
+      isPresnetIndex = i;
+      break;
+    }
   }
-  if (isPresent) {
+  if (isPresent && isPresnetIndex !== null) {
     const token = jwt.sign(payload, secret);
+    users[isPresnetIndex].token = token;
+    // console.log(    users[isPresnetIndex]);
     res.status(200).send(token);
   } else {
     res.status(401).send({

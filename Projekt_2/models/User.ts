@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 export class User {
   login: string;
   password: string;
+  token?: string;
   id?: number;
   notesId?: number[];
   tagsId?: number[];
@@ -14,11 +15,13 @@ export class User {
     if(user) {
       this.login = user.login;
       this.password = user.password;
+      this.token = user.token;
       this.notesId = user.notesId;
       this.tagsId = user.tagsId;
   } else {
       this.login = '';
       this.password = '';
+      this.token = '';
       this.notesId = [];
       this.tagsId = [];
   }
@@ -32,7 +35,7 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
     const token = authData?.split(' ')[1] ?? '';
     const payload = jwt.verify(token, secret) as { login: string };
     if (payload) {
-      return payload.login;
+      return token;
     }
   } catch (error) {
     res.status(401).send(error);
@@ -41,7 +44,7 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
 
 export let user = new User({
   // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
-  id: 12345,
+  id: 123456789,
   login: 'wiesiek',
   password: 'kot123',
 });
