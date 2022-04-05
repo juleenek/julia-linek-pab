@@ -1,6 +1,7 @@
 import fs from 'fs';
+import { Request, Response } from 'express';
 
-export class Serviced {
+export class Service2 {
   public async updateStorage<ObjetcsArrayType>(
     arr: ObjetcsArrayType,
     storeFile: string
@@ -25,3 +26,17 @@ export class Serviced {
   }
 
 }
+
+// That function check required fields
+export const checkRequired = (
+  toCheck: any,
+  res: Response,
+  message: string,
+  errNum: number
+) => {
+  if (toCheck === undefined) {
+    res.status(errNum).send({
+      error: message,
+    });
+  }
+};

@@ -3,10 +3,11 @@ import fs from 'fs';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import Note from './models/Note';
-import Tag from './models/Tag';
-import {User} from './models/User';
-import {users} from './models/User';
-import {Serviced} from './service';
+import { Tag } from './models/Tag';
+import { User, isAuth } from './models/User';
+import { user } from './models/User';
+import { Service2 } from './service';
+import { checkRequired } from './service';
 
 const app = express();
 
@@ -16,7 +17,7 @@ const storeTagFile = '../Projekt_2/data/storeTags.json';
 export let notes: Note[] = [];
 export let tags: Tag[] = [];
 
-class Service{
+class Service {
   public async updateNoteStorage(): Promise<void> {
     const data = { notes };
     try {
@@ -58,21 +59,7 @@ const service = new Service();
 service.readNoteStorage();
 service.readTagStorage();
 
-// That function check required fields
-const checkRequired = (
-  toCheck: any,
-  res: Response,
-  message: string,
-  errNum: number
-) => {
-  if (toCheck === undefined) {
-    res.status(errNum).send({
-      error: message,
-    });
-  }
-};
-
-/////////////////// CRUDE NOTE ///////////////////
+///////////////////////////////////////////////////////////// CRUDE NOTE /////////////////////////////////////////////////////////////
 
 export default notes;
 
@@ -89,7 +76,6 @@ app.get('/note/:id', function (req: Request, res: Response) {
 app.get('/notes', function (req: Request, res: Response) {
   res.status(200).send(notes);
 });
-
 app.post('/note', function (req: Request, res: Response) {
   const note: Note = req.body; // nie muszę parsować na JSON
   const tag: Tag = req.body.tags;
@@ -97,6 +83,7 @@ app.post('/note', function (req: Request, res: Response) {
   checkRequired(note.title, res, 'Please, enter a title', 400);
   checkRequired(note.content, res, 'Please, enter a content', 400);
 
+  isAuth(req, res, req.body.password);
 
   const name = (tag.name = tag.name.toLowerCase());
   if (tags.some((tag) => tag.name === name)) {
@@ -110,7 +97,25 @@ app.post('/note', function (req: Request, res: Response) {
     note.id = new Date().valueOf();
     notes.push(note);
     service.updateNoteStorage();
+    // for (let i = 0; i < users.length; i++) {
+    //   if (users[i].password === req.body.password) {
+    //     users[i].notesId!.push(note.id);
+    //     users[i].tagsId!.push(tag.id);
+    //     break;
+    //   }
+    // }
+    if (user.notesId! === undefined && user.tagsId! === undefined) {
+      user.notesId = [];
+      user.tagsId = [];
+      user.notesId!.push(note.id);
+      user.tagsId!.push(tag.id);
+    } else {
+      user.notesId!.push(note.id);
+      user.tagsId!.push(tag.id);
+    }
+    // users[0].notesId.push(note.id);
     res.status(201).send(note);
+    console.log(user);
   }
 });
 
@@ -132,7 +137,6 @@ app.put('/note/:id', function (req: Request, res: Response) {
     tag.id = new Date().valueOf();
     tags.push(tag);
     service.updateTagStorage();
-    // https://j...content-available-to-author-only...t.info/object-copy
     noteBefore = Object.assign(noteBefore, note);
     service.updateNoteStorage();
     res.status(201).send(noteBefore);
@@ -150,7 +154,7 @@ app.delete('/note/:id', function (req: Request, res: Response) {
   res.status(204).send(note);
 });
 
-///////////////////// CRUDE TAG /////////////////////
+/////////////////////////////////////////////////////////////// CRUDE TAG /////////////////////////////////////////////////////////////// 
 
 app.get('/tag/:id', function (req: Request, res: Response) {
   const id = +req.params.id;
@@ -216,7 +220,7 @@ app.delete('/tag/:id', function (req: Request, res: Response) {
   res.status(204).send(tag);
 });
 
-///////////////////// LOGIN USER /////////////////////
+/////////////////////////////////////////////////////////////// LOGIN USER ///////////////////////////////////////////////////////////////
 
 app.post('/login', function (req: Request, res: Response) {
   const user: User = req.body;
@@ -224,31 +228,23 @@ app.post('/login', function (req: Request, res: Response) {
   checkRequired(user.login, res, 'Please, enter a login', 400);
   checkRequired(user.password, res, 'Please, enter a password', 400);
 
-  user.id = new Date().valueOf();
   const payload = user.login;
   const secret = user.password;
-
-  // https://www.geeksforgeeks.org/how-to-create-and-verify-jwts-with-node-js/
-
   let isPresent = false;
   let isPresnetIndex = null;
 
-  for (let i = 0; i < users.length; i++) {
-    if (users[i].login === payload && users[i].password === secret) {
-      isPresent = true;
-      // Store the data index
-      isPresnetIndex = i;
-      break;
-    }
+  // for (let i = 0; i < users.length; i++) {
+  //   if (users[i].login === payload && users[i].password === secret) {
+  //     isPresent = true;
+  //     isPresnetIndex = i;
+  //     break;
+  //   }
+  // }
+  if (user.login === payload && user.password === secret) {
+    isPresent = true;
   }
   if (isPresent) {
-    // Create token
     const token = jwt.sign(payload, secret);
-    // res.json({
-    //   login: true,
-    //   token: token,
-    //   data: user,
-    // });
     res.status(200).send(token);
   } else {
     res.status(401).send({
@@ -258,9 +254,3 @@ app.post('/login', function (req: Request, res: Response) {
 });
 
 app.listen(3000);
-
-// const authData = req.headers.authorization
-// const token = authData?.split(' ')[1] ?? ''
-// const payload = jwt.verify(token, secret)
-// @types/jsonwebtoken
-// sekcja headers -> wartość Bearer token

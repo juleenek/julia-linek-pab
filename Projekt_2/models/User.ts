@@ -1,5 +1,5 @@
 import Note from './Note';
-import Tag from './Tag';
+import {Tag} from './Tag';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -10,12 +10,18 @@ export class User {
   notesId?: number[];
   tagsId?: number[];
 
-  constructor(user: User) {
-    this.login = user.login;
-    this.password = user.password;
-    this.id = user.id;
-    this.notesId = user.notesId;
-    this.tagsId = user.tagsId;
+  constructor(user?: User) {
+    if(user) {
+      this.login = user.login;
+      this.password = user.password;
+      this.notesId = user.notesId;
+      this.tagsId = user.tagsId;
+  } else {
+      this.login = '';
+      this.password = '';
+      this.notesId = [];
+      this.tagsId = [];
+  }
   }
 }
 
@@ -33,13 +39,31 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
   }
 };
 
-export let users: User[] = [
-  {
-    login: 'wiesiek',
-    password: 'kot123',
-  },
-  {
-    login: 'mietek',
-    password: 'kruk123',
-  },
-];
+export let user = new User({
+  // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
+  id: 12345,
+  login: 'wiesiek',
+  password: 'kot123',
+});
+
+// export let users: User[] = [
+//   {
+//     // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
+//     id: 12345,
+//     login: 'wiesiek',
+//     password: 'kot123',
+//     notesId: [],
+//     tagsId: []
+//   },
+//   {
+//     id: 6789,
+//     login: 'mietek',
+//     password: 'kruk123',
+//   }
+// ];
+
+// const authData = req.headers.authorization
+// const token = authData?.split(' ')[1] ?? ''
+// const payload = jwt.verify(token, secret)
+// @types/jsonwebtoken
+// sekcja headers -> wartość Bearer token

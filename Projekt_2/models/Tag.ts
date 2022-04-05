@@ -1,4 +1,4 @@
-class Tag {
+export class Tag {
   id?: number;
   name: string;
 
@@ -8,5 +8,5 @@ class Tag {
   }
 }
 
-export default Tag;
+
 
