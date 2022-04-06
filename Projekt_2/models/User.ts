@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 export class User {
   login: string;
   password: string;
-  token?: string;
   id?: number;
   notesId?: number[];
   tagsId?: number[];
@@ -15,13 +14,11 @@ export class User {
     if(user) {
       this.login = user.login;
       this.password = user.password;
-      this.token = user.token;
       this.notesId = user.notesId;
       this.tagsId = user.tagsId;
   } else {
       this.login = '';
       this.password = '';
-      this.token = '';
       this.notesId = [];
       this.tagsId = [];
   }
@@ -31,12 +28,14 @@ export class User {
 export const isAuth = (req: Request, res: Response, secret: string) => {
   try {
     const authData = req.headers['authorization'];
-    if (!authData) throw new Error('You need to log in');
+    if (!authData){
+      return false;
+    }
     const token = authData?.split(' ')[1] ?? '';
     const payload = jwt.verify(token, secret) as { login: string };
     if (payload) {
-      return token;
-    }
+      return true;
+    } 
   } catch (error) {
     res.status(401).send(error);
   }
@@ -77,4 +76,10 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
 // 3) Dodawanie id notatek i tagów a token
 
 // ToDo:
-// Ref - tag already exists
+// Ref - tag already exists fun
+
+// ROUTE
+
+// app,use(/note, nroute)
+// route.put(/:id)
+// notes => note/list - najpierw, sztywny get

@@ -7,6 +7,7 @@ export class Service2 {
     storeFile: string
   ): Promise<void> {
     try {
+      // data?
       const data = { arr };
       await fs.promises.writeFile(storeFile, JSON.stringify(data));
     } catch (err) {

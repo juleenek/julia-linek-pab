@@ -22,7 +22,6 @@ users.push(user);
 user.id = 123456789;
 user.login = 'wiesiek';
 const secret = 'kot123';
-user.password = secret;
 
 class Service {
   public async updateNoteStorage(): Promise<void> {
@@ -90,7 +89,12 @@ app.get('/note/:id', function (req: Request, res: Response) {
 });
 
 app.get('/notes', function (req: Request, res: Response) {
-  res.status(200).send(notes);
+  if (isAuth(req, res, secret)) {
+    console.log(isAuth(req, res, secret));
+    res.status(200).send(notes);
+  } else {
+    
+  }
 });
 app.post('/note', function (req: Request, res: Response) {
   const note: Note = req.body; // nie muszę parsować na JSON
@@ -99,37 +103,20 @@ app.post('/note', function (req: Request, res: Response) {
   checkRequired(note.title, res, 'Please, enter a title', 400);
   checkRequired(note.content, res, 'Please, enter a content', 400);
 
-  isAuth(req, res, req.body.password);
-  const authData = req.headers['authorization'];
-  const token = authData?.split(' ')[1] ?? '';
-
-  const name = (tag.name = tag.name.toLowerCase());
-  if (tags.some((tag) => tag.name === name)) {
-    res.status(404).send({
-      error: 'Tag already exist',
-    });
-  } else {
-    tag.id = new Date().valueOf();
-    tags.push(tag);
-    service.updateTagStorage();
-    note.id = new Date().valueOf();
-    notes.push(note);
-    service.updateNoteStorage();
-
-    let userWithTok = users.find((u) => u.token === token);
-
-    // console.log(userWithTok);
-    if (userWithTok) {
-      if (userWithTok.notesId == undefined && userWithTok.tagsId == undefined) {
-        userWithTok.notesId = [];
-        userWithTok.tagsId = [];
-      }
-      userWithTok!.notesId!.push(note.id);
-      userWithTok!.tagsId!.push(tag.id);
+  if (isAuth(req, res, secret)) {
+    const name = (tag.name = tag.name.toLowerCase());
+    if (tags.some((tag) => tag.name === name)) {
+      res.status(404).send({
+        error: 'Tag already exist',
+      });
+    } else {
+      tag.id = new Date().valueOf();
+      tags.push(tag);
+      service.updateTagStorage();
+      note.id = new Date().valueOf();
+      notes.push(note);
+      service.updateNoteStorage();
     }
-    console.log(users);
-    res.status(201).send(note);
-    // console.log(users);
   }
 });
 
@@ -255,7 +242,7 @@ app.post('/login', function (req: Request, res: Response) {
   }
   if (isPresent && isPresnetIndex !== null) {
     const token = jwt.sign(payload, secret);
-    users[isPresnetIndex].token = token;
+    // users[isPresnetIndex].token = token;
     // console.log(    users[isPresnetIndex]);
     res.status(200).send(token);
   } else {
