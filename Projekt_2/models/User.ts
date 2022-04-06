@@ -42,12 +42,12 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
   }
 };
 
-export let user = new User({
-  // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
-  id: 123456789,
-  login: 'wiesiek',
-  password: 'kot123',
-});
+// export let user = new User({
+//   // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
+//   id: 123456789,
+//   login: 'wiesiek',
+//   password: 'kot123',
+// });
 
 // export let users: User[] = [
 //   {
@@ -70,3 +70,11 @@ export let user = new User({
 // const payload = jwt.verify(token, secret)
 // @types/jsonwebtoken
 // sekcja headers -> wartość Bearer token
+
+// Pytania:
+// 1) Jak debugować?
+// 2) Uniwersalne read i update
+// 3) Dodawanie id notatek i tagów a token
+
+// ToDo:
+// Ref - tag already exists

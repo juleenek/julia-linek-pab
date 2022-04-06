@@ -24,47 +24,11 @@ user.login = 'wiesiek';
 const secret = 'kot123';
 user.password = secret;
 
-class Service {
-  public async updateNoteStorage(): Promise<void> {
-    const data = { notes };
-    try {
-      await fs.promises.writeFile(storeNoteFile, JSON.stringify(data));
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async readNoteStorage(): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(storeNoteFile, 'utf-8');
-      notes = JSON.parse(data).notes;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async updateTagStorage(): Promise<void> {
-    // to do: parametry
-    const data = { tags };
-    try {
-      await fs.promises.writeFile(storeTagFile, JSON.stringify(data));
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async readTagStorage(): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(storeTagFile, 'utf-8');
-      tags = JSON.parse(data).tags;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-}
-
 app.use(express.json()); // praca z JSONem
 
-const service = new Service();
-service.readNoteStorage();
-service.readTagStorage();
+const service = new Service2();
+service.readStorage(notes, storeNoteFile);
+service.readStorage(tags, storeTagFile);
 
 ///////////////////////////////////////////////////////////// CRUDE NOTE /////////////////////////////////////////////////////////////
 
@@ -111,10 +75,10 @@ app.post('/note', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage(tags, storeTagFile);
     note.id = new Date().valueOf();
     notes.push(note);
-    service.updateNoteStorage();
+    service.updateStorage(notes, storeNoteFile);
 
     let userWithTok = users.find((u) => u.token === token);
 
@@ -150,9 +114,9 @@ app.put('/note/:id', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage(tags, storeTagFile);
     noteBefore = Object.assign(noteBefore, note);
-    service.updateNoteStorage();
+    service.updateStorage(notes, storeNoteFile);
     res.status(201).send(noteBefore);
   }
 });
@@ -198,7 +162,7 @@ app.post('/tag', function (req: Request, res: Response) {
     });
   } else {
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage(tags, storeTagFile);
     res.status(201).send(tag);
   }
 });
@@ -218,7 +182,7 @@ app.put('/tag/:id', function (req: Request, res: Response) {
     });
   } else {
     tagBefore = Object.assign(tagBefore, tag);
-    service.updateTagStorage();
+    service.updateStorage(tags, storeTagFile);
     res.status(201).send(tagBefore);
   }
 });
