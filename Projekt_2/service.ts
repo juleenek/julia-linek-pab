@@ -3,12 +3,11 @@ import { Request, Response } from 'express';
 
 export class Service2 {
   public async updateStorage<ObjetcsArrayType>(
-    arr: ObjetcsArrayType,
+    data: ObjetcsArrayType,
     storeFile: string
   ): Promise<void> {
     try {
       // data?
-      const data = { arr };
       await fs.promises.writeFile(storeFile, JSON.stringify(data));
     } catch (err) {
       console.log(err);

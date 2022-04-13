@@ -26,7 +26,7 @@ export class User {
 }
 
 export const isAuth = (req: Request, res: Response, secret: string) => {
-  try {
+
     const authData = req.headers['authorization'];
     if (!authData){
       return false;
@@ -36,9 +36,7 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
     if (payload) {
       return true;
     } 
-  } catch (error) {
-    res.status(401).send(error);
-  }
+
 };
 
 // export let user = new User({
@@ -63,6 +61,8 @@ export const isAuth = (req: Request, res: Response, secret: string) => {
 //     password: 'kruk123',
 //   }
 // ];
+
+// osobny plik dla admina
 
 // const authData = req.headers.authorization
 // const token = authData?.split(' ')[1] ?? ''

@@ -21,7 +21,8 @@ let user = new User();
 users.push(user);
 user.id = 123456789;
 user.login = 'wiesiek';
-const secret = 'kot123';
+export const secret = 'kot123';
+user.password = secret;
 
 class Service {
   public async updateNoteStorage(): Promise<void> {
@@ -78,23 +79,12 @@ app.get('/note/:id', function (req: Request, res: Response) {
   checkRequired(note, res, 'Note not found', 404);
   isAuth(req, res, secret);
   res.status(200).send(note);
-
-  // if (user.notesId!.includes(note.id)) {
-  //   res.status(200).send(note);
-  // } else {
-  //   res.status(401).send({
-  //     error: `User doesn't have note with this id.`
-  //   });
-  // }
 });
 
 app.get('/notes', function (req: Request, res: Response) {
-  if (isAuth(req, res, secret)) {
-    console.log(isAuth(req, res, secret));
-    res.status(200).send(notes);
-  } else {
-    
-  }
+  isAuth(req, res, secret)
+    ? res.status(200).send(notes.filter((n) => n.private === true))
+    : res.status(200).send(notes.filter((n) => n.private === false));
 });
 app.post('/note', function (req: Request, res: Response) {
   const note: Note = req.body; // nie muszę parsować na JSON
@@ -103,20 +93,23 @@ app.post('/note', function (req: Request, res: Response) {
   checkRequired(note.title, res, 'Please, enter a title', 400);
   checkRequired(note.content, res, 'Please, enter a content', 400);
 
-  if (isAuth(req, res, secret)) {
-    const name = (tag.name = tag.name.toLowerCase());
-    if (tags.some((tag) => tag.name === name)) {
-      res.status(404).send({
-        error: 'Tag already exist',
-      });
-    } else {
-      tag.id = new Date().valueOf();
-      tags.push(tag);
-      service.updateTagStorage();
-      note.id = new Date().valueOf();
-      notes.push(note);
-      service.updateNoteStorage();
-    }
+  const name = (tag.name = tag.name.toLowerCase());
+  if (tags.some((tag) => tag.name === name)) {
+    res.status(404).send({
+      error: 'Tag already exist',
+    });
+  } else {
+    tag.id = new Date().valueOf();
+    tags.push(tag);
+    service.updateTagStorage();
+    note.id = new Date().valueOf();
+    notes.push(note);
+    service.updateNoteStorage();
+
+    isAuth(req, res, secret) ? note.private == true : note.private == false;
+    console.log(users);
+
+    res.status(201).send(note);
   }
 });
 
@@ -128,6 +121,8 @@ app.put('/note/:id', function (req: Request, res: Response) {
   checkRequired(note.title, res, 'Please, enter a title', 404);
   checkRequired(note.content, res, 'Please, enter a content', 404);
   checkRequired(noteBefore, res, 'Note not found', 404);
+
+  isAuth(req, res, secret);
 
   const name = (tag.name = tag.name.toLowerCase());
   if (tags.some((tag) => tag.name === name)) {
@@ -148,6 +143,8 @@ app.delete('/note/:id', function (req: Request, res: Response) {
   const note = notes.find((e) => e.id === +req.params.id);
   checkRequired(note, res, 'Note not found', 400);
 
+  isAuth(req, res, secret);
+
   notes.splice(
     notes.findIndex((note) => note.id === +req.params.id),
     1
@@ -159,6 +156,7 @@ app.delete('/note/:id', function (req: Request, res: Response) {
 
 app.get('/tag/:id', function (req: Request, res: Response) {
   const id = +req.params.id;
+  isAuth(req, res, secret);
   const tag = tags.find((tag) => {
     return tag.id === id;
   });
@@ -168,6 +166,7 @@ app.get('/tag/:id', function (req: Request, res: Response) {
 });
 
 app.get('/tags', function (req: Request, res: Response) {
+  isAuth(req, res, secret);
   res.status(200).send(tags);
 });
 
@@ -175,6 +174,7 @@ app.post('/tag', function (req: Request, res: Response) {
   const tag: Tag = req.body;
 
   checkRequired(tag.name, res, 'Please, enter a tag name', 400);
+  isAuth(req, res, secret);
 
   tag.id = new Date().valueOf();
   const name = (tag.name = tag.name.toLowerCase());
@@ -197,6 +197,8 @@ app.put('/tag/:id', function (req: Request, res: Response) {
   checkRequired(tag.name, res, 'Please, enter a title', 404);
   checkRequired(tagBefore, res, 'Note not found', 404);
 
+  isAuth(req, res, secret);
+
   const name = (tag.name = tag.name.toLowerCase());
 
   if (tags.some((tag) => tag.name === name)) {
@@ -213,6 +215,8 @@ app.put('/tag/:id', function (req: Request, res: Response) {
 app.delete('/tag/:id', function (req: Request, res: Response) {
   const tag = tags.find((e) => e.id === +req.params.id);
   checkRequired(tag, res, 'Note not found', 400);
+
+  isAuth(req, res, secret);
 
   tags.splice(
     tags.findIndex((tag) => tag.id === +req.params.id),
@@ -242,7 +246,6 @@ app.post('/login', function (req: Request, res: Response) {
   }
   if (isPresent && isPresnetIndex !== null) {
     const token = jwt.sign(payload, secret);
-    // users[isPresnetIndex].token = token;
     // console.log(    users[isPresnetIndex]);
     res.status(200).send(token);
   } else {

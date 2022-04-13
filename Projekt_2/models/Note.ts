@@ -1,4 +1,4 @@
-import Tag from "./Tag";
+import {Tag} from "./Tag";
 
 class Note {
   title: string;
@@ -6,6 +6,7 @@ class Note {
   createDate?: string;
   tags?: Tag[];
   id?: number;
+  private: boolean;
 
   constructor(note: Note) {
     // Pakuje do obiektu - przykład z konwersatorium
@@ -14,6 +15,7 @@ class Note {
     this.createDate = note.createDate;
     this.tags = note.tags;
     this.id = note.id;
+    this.private = true; // domyślnie prywatna
   }
 }
 
