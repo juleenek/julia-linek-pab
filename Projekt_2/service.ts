@@ -1,6 +1,10 @@
 import fs from 'fs';
 import { Request, Response } from 'express';
 
+
+const storeNoteFile = '../Projekt_2/data/storeNotes.json';
+const storeTagFile = '../Projekt_2/data/storeTags.json';
+
 export class Service2 {
   public async updateStorage<ObjetcsArrayType>(
     data: ObjetcsArrayType,
@@ -24,7 +28,6 @@ export class Service2 {
       console.log(err);
     }
   }
-
 }
 
 // That function check required fields
