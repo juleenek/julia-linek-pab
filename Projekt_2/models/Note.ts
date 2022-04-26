@@ -6,6 +6,7 @@ class Note {
   createDate?: string;
   tags?: Tag[];
   id?: number;
+  author?: string;
   private: boolean;
 
   constructor(note: Note) {
@@ -15,6 +16,7 @@ class Note {
     this.createDate = note.createDate;
     this.tags = note.tags;
     this.id = note.id;
+    this.author = note.author;
     this.private = true; // domyślnie prywatna
   }
 }

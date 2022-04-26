@@ -18,22 +18,19 @@ export let users: User[] = [];
 
 const storeNoteFile = '../Projekt_2/data/storeNotes.json';
 const storeTagFile = '../Projekt_2/data/storeTags.json';
+const storeUserFile = '../Projekt_2/data/storeUsers.json';
 
 export const secret = 'kot123';
-
-let user = new User();
-user.id = 123456789;
-user.login = 'wiesiek';
-user.password = secret;
-users.push(user);
 
 export class Service {
   public async updateStorage(): Promise<void> {
     const dataNotes = { notes };
     const dataTags = { tags };
+    const dataUsers = { users };
     try {
       await fs.promises.writeFile(storeNoteFile, JSON.stringify(dataNotes));
       await fs.promises.writeFile(storeTagFile, JSON.stringify(dataTags));
+      await fs.promises.writeFile(storeUserFile, JSON.stringify(dataUsers));
     } catch (err) {
       console.log(err);
     }
@@ -42,8 +39,10 @@ export class Service {
     try {
       const dataNotes = await fs.promises.readFile(storeNoteFile, 'utf-8');
       const dataTags = await fs.promises.readFile(storeTagFile, 'utf-8');
+      const dataUsers = await fs.promises.readFile(storeUserFile, 'utf-8');
       notes = JSON.parse(dataNotes).notes;
       tags = JSON.parse(dataTags).tags;
+      users = JSON.parse(dataUsers).users;
     } catch (err) {
       console.log(err);
     }

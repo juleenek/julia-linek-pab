@@ -8,59 +8,28 @@ export class User {
   password: string;
   id?: number;
   notesId?: number[];
-  tagsId?: number[];
 
   constructor(user?: User) {
     if(user) {
       this.login = user.login;
       this.password = user.password;
       this.notesId = user.notesId;
-      this.tagsId = user.tagsId;
   } else {
       this.login = '';
       this.password = '';
       this.notesId = [];
-      this.tagsId = [];
   }
   }
 }
 
 export const isAuth = (req: Request, res: Response, secret: string) => {
 
-    const authData = req.headers['authorization'];
-    if (!authData){
-      return false;
-    }
-    const token = authData?.split(' ')[1] ?? '';
-    const payload = jwt.verify(token, secret) as { login: string };
-    if (payload) {
-      return true;
-    } 
-
+  const authData = req.headers['authorization'];
+  if (!authData) throw Error("Authorization header not found");
+  const token = authData?.split(' ')[1] ?? '';
+  const payload = jwt.verify(token, secret);
+  if(payload) return payload;
 };
-
-// export let user = new User({
-//   // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
-//   id: 123456789,
-//   login: 'wiesiek',
-//   password: 'kot123',
-// });
-
-// export let users: User[] = [
-//   {
-//     // eyJhbGciOiJIUzI1NiJ9.d2llc2llaw.D_YbfgYOQT8JCkVDUM-9x5qMOuRBx41BMQFOnPJu55w
-//     id: 12345,
-//     login: 'wiesiek',
-//     password: 'kot123',
-//     notesId: [],
-//     tagsId: []
-//   },
-//   {
-//     id: 6789,
-//     login: 'mietek',
-//     password: 'kruk123',
-//   }
-// ];
 
 // osobny plik dla admina
 

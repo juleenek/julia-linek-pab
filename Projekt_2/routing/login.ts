@@ -13,7 +13,7 @@ app.use(express.json());
 
 module.exports = router;
 
-app.post('/login', function (req: Request, res: Response) {
+router.post('', (req: Request, res: Response) => {
   const user: User = req.body;
 
   checkRequired(user.login, res, 'Please, enter a login', 400);

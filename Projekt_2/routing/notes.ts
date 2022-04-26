@@ -17,6 +17,7 @@ router.get('', (req: Request, res: Response) => {
 });
 router.get('/user/:userName', (req: Request, res: Response) => {
   const login = req.params.userName;
+  console.log(isAuth(req, res, secret));
   if (isAuth(req, res, secret)) {
     isAuth(req, res, secret);
     const user = users.find((user) => {
@@ -31,7 +32,7 @@ router.get('/user/:userName', (req: Request, res: Response) => {
     }
   } else {
     res.status(404).send({
-      error: 'Please, log in.',
+      error: 'Please, log in.', 
     });
   }
 });
