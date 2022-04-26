@@ -1,61 +1,49 @@
 import express from 'express';
 import fs from 'fs';
-import { Request, Response } from 'express';
 import { Tag } from './models/Tag';
 import Note from './models/Note';
 import { User } from './models/User';
 
-const note = require('./routing/note');
-const tag = require('./routing/tag');
-const login = require('./routing/login');
+const noteRoute = require('./routing/note');
+const notesRoute = require('./routing/notes');
+const tagRoute = require('./routing/tag');
+const loginRoute = require('./routing/login');
 
 const app = express();
 app.use(express.json());
 
 export let notes: Note[] = [];
+export let tags: Tag[] = [];
+export let users: User[] = [];
 
 const storeNoteFile = '../Projekt_2/data/storeNotes.json';
 const storeTagFile = '../Projekt_2/data/storeTags.json';
 
-export let tags: Tag[] = [];
-export let users: User[] = [];
+export const secret = 'kot123';
+
 let user = new User();
-users.push(user);
 user.id = 123456789;
 user.login = 'wiesiek';
-export const secret = 'kot123';
 user.password = secret;
+users.push(user);
 
 export class Service {
-  public async updateNoteStorage(): Promise<void> {
-    const data = { notes };
+  public async updateStorage(): Promise<void> {
+    const dataNotes = { notes };
+    const dataTags = { tags };
     try {
-      await fs.promises.writeFile(storeNoteFile, JSON.stringify(data));
+      await fs.promises.writeFile(storeNoteFile, JSON.stringify(dataNotes));
+      await fs.promises.writeFile(storeTagFile, JSON.stringify(dataTags));
     } catch (err) {
       console.log(err);
     }
   }
-  public async readNoteStorage(): Promise<void> {
+  public async readStorage(): Promise<void> {
     try {
-      const data = await fs.promises.readFile(storeNoteFile, 'utf-8');
-      notes = JSON.parse(data).notes;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async updateTagStorage(): Promise<void> {
-    // to do: parametry
-    const data = { tags };
-    try {
-      await fs.promises.writeFile(storeTagFile, JSON.stringify(data));
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  public async readTagStorage(): Promise<void> {
-    try {
-      const data = await fs.promises.readFile(storeTagFile, 'utf-8');
-      tags = JSON.parse(data).tags;
+      const dataNotes = await fs.promises.readFile(storeNoteFile, 'utf-8');
+      const dataTags = await fs.promises.readFile(storeTagFile, 'utf-8');
+      notes = JSON.parse(dataNotes).notes;
+      tags = JSON.parse(dataTags).tags;
     } catch (err) {
       console.log(err);
     }
@@ -63,11 +51,12 @@ export class Service {
 }
 
 export const service = new Service();
-service.readNoteStorage();
-service.readTagStorage();
+service.readStorage();
 
-app.use('/note', note);
-app.use('/tag', tag);
-app.use('/login', tag);
+app.use('/note', noteRoute);
+app.use('/notes', notesRoute);
+app.use('/tag', tagRoute);
+app.use('/login', loginRoute);
+
 
 app.listen(3000);

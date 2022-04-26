@@ -2,29 +2,18 @@ const express = require('express');
 const app = express();
 
 import { Request, Response } from 'express';
-import { isAuth } from '../models/User';
 import { checkRequired } from '../service';
-import { secret } from '../index';
-import { tags } from '../index';
-import { users } from '../index';
+import { secret, tags, notes, users, service } from '../index';
 import { Tag } from '../models/Tag';
 import Note from '../models/Note';
-import { notes } from '../index';
-import { service } from '../index';
+import { isAuth } from '../models/User';
 
 const router = express.Router();
 app.use(express.json());
 
 module.exports = router;
 
-router.get('/list', (req: Request, res: Response) => {
-  res.status(200).send(notes);
-  // isAuth(req, res, secret)
-  //   ? res.status(200).send(notes.filter((n) => n.private === true))
-  //   : res.status(200).send(notes.filter((n) => n.private === false));
-});
 router.get('/:id', (req: Request, res: Response) => {
-  console.log(req.params);
   const id = +req.params.id;
   const note = notes.find((note) => {
     return note.id === id;
@@ -57,10 +46,10 @@ router.post('', (req: Request, res: Response) => {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage();
     note.id = new Date().valueOf();
     notes.push(note);
-    service.updateNoteStorage();
+    service.updateStorage();
 
     isAuth(req, res, secret) ? note.private == true : note.private == false;
     console.log(users);
@@ -87,9 +76,9 @@ router.put('/note/:id', function (req: Request, res: Response) {
   } else {
     tag.id = new Date().valueOf();
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage();
     noteBefore = Object.assign(noteBefore, note);
-    service.updateNoteStorage();
+    service.updateStorage();
     res.status(201).send(noteBefore);
   }
 });

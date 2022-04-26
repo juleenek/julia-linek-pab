@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 
 const storeNoteFile = '../Projekt_2/data/storeNotes.json';

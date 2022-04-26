@@ -4,10 +4,8 @@ const app = express();
 import { Request, Response } from 'express';
 import { isAuth } from '../models/User';
 import { checkRequired } from '../service';
-import { secret } from '../index';
-import { tags } from '../index';
+import { secret, tags, service } from '../index';
 import { Tag } from '../models/Tag';
-import { service } from '../index';
 
 const router = express.Router();
 app.use(express.json());
@@ -45,7 +43,7 @@ router.post('/tag', function (req: Request, res: Response) {
     });
   } else {
     tags.push(tag);
-    service.updateTagStorage();
+    service.updateStorage();
     res.status(201).send(tag);
   }
 });
@@ -67,7 +65,7 @@ router.put('/tag/:id', function (req: Request, res: Response) {
     });
   } else {
     tagBefore = Object.assign(tagBefore, tag);
-    service.updateTagStorage();
+    service.updateStorage();
     res.status(201).send(tagBefore);
   }
 });
