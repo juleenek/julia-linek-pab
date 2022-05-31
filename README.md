@@ -1,6 +1,6 @@
 ## julia-linek-pab
 
-Repozytorium w którym wykonywane są projekty z zajęć laboratoryjnych z przedmiotu "Programowanie aplikacji back-endowych"
+Repozytorium w którym znajdują się projekty z zajęć laboratoryjnych z przedmiotu "Programowanie aplikacji back-endowych"
 
 ## Projekt semestralny
 
